@@ -66,20 +66,6 @@ const Contact = () => {
               </p>
             </div>
             
-            {/* Investment Opportunity */}
-            <div className="bg-gradient-primary p-8 rounded-2xl shadow-glow">
-              <h3 className="text-2xl font-bold text-primary-foreground mb-4">
-                Investment Opportunity
-              </h3>
-              <div className="text-3xl font-bold text-accent mb-2">Seed Round: ₹50 Lakhs</div>
-              <div className="grid grid-cols-2 gap-4 text-sm text-primary-foreground/90">
-                <div>• 40% Tech Development</div>
-                <div>• 30% Farmer Logistics</div>
-                <div>• 20% Marketing</div>
-                <div>• 10% Wellness Network</div>
-              </div>
-            </div>
-            
             {/* Contact Methods */}
             <div className="space-y-4">
               <h3 className="text-xl font-semibold text-foreground">Get in Touch</h3>
