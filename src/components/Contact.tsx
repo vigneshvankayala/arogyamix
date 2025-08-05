@@ -154,14 +154,16 @@ const Contact = () => {
               join us in building a healthier, more sustainable future.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Link to="/partner-onboarding">
+              <Link to="/farmer-onboarding">
                 <Button variant="hero" size="lg" className="bg-primary-foreground text-primary hover:bg-primary-foreground/90">
-                  Partner With Us
+                  Join as Farmer
                 </Button>
               </Link>
-              <Button variant="outline" size="lg" className="border-primary-foreground/30 text-primary-foreground hover:bg-primary-foreground/10">
-                Download Pitch Deck
-              </Button>
+              <Link to="/partner-onboarding">
+                <Button variant="outline" size="lg" className="border-primary-foreground/30 text-primary-foreground hover:bg-primary-foreground/10">
+                  Other Partnerships
+                </Button>
+              </Link>
             </div>
           </div>
         </div>
