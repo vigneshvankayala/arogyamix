@@ -1,5 +1,6 @@
 import { Mail, Phone, Globe, Instagram, Twitter, Linkedin } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Link } from "react-router-dom";
 import farmersImage from "@/assets/farmers-field.jpg";
 
 const Contact = () => {
@@ -153,9 +154,11 @@ const Contact = () => {
               join us in building a healthier, more sustainable future.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Button variant="hero" size="lg" className="bg-primary-foreground text-primary hover:bg-primary-foreground/90">
-                Partner With Us
-              </Button>
+              <Link to="/partner-onboarding">
+                <Button variant="hero" size="lg" className="bg-primary-foreground text-primary hover:bg-primary-foreground/90">
+                  Partner With Us
+                </Button>
+              </Link>
               <Button variant="outline" size="lg" className="border-primary-foreground/30 text-primary-foreground hover:bg-primary-foreground/10">
                 Download Pitch Deck
               </Button>

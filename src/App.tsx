@@ -9,6 +9,7 @@ import Store from "./pages/Store";
 import Appointments from "./pages/Appointments";
 import NotFound from "./pages/NotFound";
 import Navbar from "./components/Navbar";
+import PartnerOnboarding from "./components/PartnerOnboarding";
 
 const queryClient = new QueryClient();
 
@@ -24,6 +25,7 @@ const App = () => (
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/store" element={<Store />} />
           <Route path="/appointments" element={<Appointments />} />
+          <Route path="/partner-onboarding" element={<PartnerOnboarding />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>

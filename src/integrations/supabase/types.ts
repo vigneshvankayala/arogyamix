@@ -14,7 +14,66 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      partners: {
+        Row: {
+          additional_info: string | null
+          business_address: string | null
+          business_name: string | null
+          business_size: string | null
+          certifications: string[] | null
+          created_at: string
+          current_suppliers: string[] | null
+          email: string
+          experience_years: number | null
+          full_name: string
+          id: string
+          partner_type: Database["public"]["Enums"]["partner_type"]
+          phone: string
+          specializations: string[] | null
+          status: string | null
+          target_market: string | null
+          updated_at: string
+        }
+        Insert: {
+          additional_info?: string | null
+          business_address?: string | null
+          business_name?: string | null
+          business_size?: string | null
+          certifications?: string[] | null
+          created_at?: string
+          current_suppliers?: string[] | null
+          email: string
+          experience_years?: number | null
+          full_name: string
+          id?: string
+          partner_type: Database["public"]["Enums"]["partner_type"]
+          phone: string
+          specializations?: string[] | null
+          status?: string | null
+          target_market?: string | null
+          updated_at?: string
+        }
+        Update: {
+          additional_info?: string | null
+          business_address?: string | null
+          business_name?: string | null
+          business_size?: string | null
+          certifications?: string[] | null
+          created_at?: string
+          current_suppliers?: string[] | null
+          email?: string
+          experience_years?: number | null
+          full_name?: string
+          id?: string
+          partner_type?: Database["public"]["Enums"]["partner_type"]
+          phone?: string
+          specializations?: string[] | null
+          status?: string | null
+          target_market?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
@@ -23,7 +82,7 @@ export type Database = {
       [_ in never]: never
     }
     Enums: {
-      [_ in never]: never
+      partner_type: "farmer" | "nutritionist" | "retailer"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -150,6 +209,8 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      partner_type: ["farmer", "nutritionist", "retailer"],
+    },
   },
 } as const
