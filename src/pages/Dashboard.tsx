@@ -1,276 +1,295 @@
-import { Card } from "@/components/ui/card";
+import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { Progress } from "@/components/ui/progress";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { useToast } from "@/components/ui/use-toast";
+import { supabase } from "@/integrations/supabase/client";
+import { User, Session } from "@supabase/supabase-js";
 import { 
-  Brain, 
   Calendar, 
   ShoppingCart, 
-  Activity, 
-  Target, 
-  Zap,
-  TrendingUp,
-  Heart,
-  Apple,
+  User as UserIcon, 
+  Heart, 
+  LogOut,
+  Home,
   Clock,
-  Plus
+  Settings
 } from "lucide-react";
+import AppointmentBooking from "@/components/AppointmentBooking";
+import AppointmentsList from "@/components/AppointmentsList";
+import UserProfile from "@/components/UserProfile";
 
 const Dashboard = () => {
-  const healthMetrics = [
-    { label: "Health Score", value: 78, color: "text-primary", trend: "+5%" },
-    { label: "Nutrition Balance", value: 85, color: "text-accent", trend: "+12%" },
-    { label: "Immunity Level", value: 72, color: "text-primary-glow", trend: "+8%" },
-  ];
+  const [user, setUser] = useState<User | null>(null);
+  const [session, setSession] = useState<Session | null>(null);
+  const [loading, setLoading] = useState(true);
+  const navigate = useNavigate();
+  const { toast } = useToast();
 
-  const aiRecommendations = [
-    {
-      type: "nutrition",
-      title: "Increase Iron Intake",
-      description: "Based on your recent health analysis, consider adding spinach and lentils to your diet.",
-      priority: "high",
-      category: "Nutrition"
-    },
-    {
-      type: "exercise",
-      title: "Morning Yoga Session",
-      description: "Your stress levels indicate benefits from 20-minute morning yoga sessions.",
-      priority: "medium", 
-      category: "Wellness"
-    },
-    {
-      type: "supplement",
-      title: "Vitamin D Supplement",
-      description: "Regional analysis suggests Vitamin D supplementation for optimal health.",
-      priority: "medium",
-      category: "Supplements"
-    }
-  ];
+  useEffect(() => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(
+      (event, session) => {
+        setSession(session);
+        setUser(session?.user ?? null);
+        
+        if (!session?.user) {
+          navigate('/auth');
+        }
+        setLoading(false);
+      }
+    );
 
-  const upcomingAppointments = [
-    {
-      date: "Today, 3:00 PM",
-      type: "Nutritionist Consultation",
-      doctor: "Dr. Priya Sharma",
-      status: "confirmed"
-    },
-    {
-      date: "Tomorrow, 10:00 AM", 
-      type: "Health Check-up",
-      doctor: "Dr. Rajesh Kumar",
-      status: "pending"
-    }
-  ];
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setSession(session);
+      setUser(session?.user ?? null);
+      
+      if (!session?.user) {
+        navigate('/auth');
+      }
+      setLoading(false);
+    });
 
-  const recentOrders = [
-    {
-      id: "NK001",
-      name: "Family Nutrition Kit - Premium",
-      date: "2 days ago",
-      status: "delivered",
-      amount: "₹1,299"
-    },
-    {
-      id: "DF005",
-      name: "Organic Almonds & Dates",
-      date: "1 week ago", 
-      status: "delivered",
-      amount: "₹750"
+    return () => subscription.unsubscribe();
+  }, [navigate]);
+
+  const handleSignOut = async () => {
+    try {
+      const { error } = await supabase.auth.signOut();
+      if (error) throw error;
+      
+      toast({
+        title: "Signed out",
+        description: "You have been successfully signed out.",
+      });
+      navigate('/');
+    } catch (error: any) {
+      toast({
+        title: "Error",
+        description: error.message || "Failed to sign out",
+        variant: "destructive",
+      });
     }
-  ];
+  };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-primary mx-auto"></div>
+          <p className="mt-4 text-muted-foreground">Loading your dashboard...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (!user) {
+    return null;
+  }
 
   return (
     <div className="min-h-screen bg-background">
-      <div className="container mx-auto px-4 py-8">
-        {/* Header */}
-        <div className="mb-8">
-          <h1 className="text-3xl md:text-4xl font-bold text-foreground mb-2">
-            Welcome back, Priya! 👋
-          </h1>
-          <p className="text-lg text-muted-foreground">
-            Here's your personalized health dashboard
-          </p>
-        </div>
-
-        {/* Health Metrics */}
-        <div className="grid md:grid-cols-3 gap-6 mb-8">
-          {healthMetrics.map((metric, index) => (
-            <Card key={index} className="p-6 bg-gradient-card border shadow-soft">
-              <div className="flex items-center justify-between mb-4">
-                <h3 className="font-semibold text-foreground">{metric.label}</h3>
-                <Badge variant="outline" className="text-primary">
-                  {metric.trend}
-                </Badge>
-              </div>
-              <div className="space-y-3">
-                <div className={`text-3xl font-bold ${metric.color}`}>
-                  {metric.value}%
-                </div>
-                <Progress value={metric.value} className="h-2" />
-              </div>
-            </Card>
-          ))}
-        </div>
-
-        <div className="grid lg:grid-cols-3 gap-8">
-          {/* AI Recommendations */}
-          <div className="lg:col-span-2 space-y-6">
-            <Card className="p-6 shadow-soft">
-              <div className="flex items-center gap-3 mb-6">
-                <div className="w-10 h-10 bg-primary/10 rounded-full flex items-center justify-center">
-                  <Brain className="w-5 h-5 text-primary" />
-                </div>
-                <div>
-                  <h2 className="text-xl font-bold text-foreground">AI Health Recommendations</h2>
-                  <p className="text-sm text-muted-foreground">Personalized insights based on your health data</p>
-                </div>
-              </div>
-
-              <div className="space-y-4">
-                {aiRecommendations.map((rec, index) => (
-                  <div key={index} className="p-4 border border-border rounded-lg hover:shadow-soft transition-shadow">
-                    <div className="flex items-start justify-between">
-                      <div className="flex-1">
-                        <div className="flex items-center gap-2 mb-2">
-                          <Badge 
-                            variant={rec.priority === 'high' ? 'destructive' : 'secondary'}
-                            className="text-xs"
-                          >
-                            {rec.priority}
-                          </Badge>
-                          <Badge variant="outline" className="text-xs">
-                            {rec.category}
-                          </Badge>
-                        </div>
-                        <h3 className="font-semibold text-foreground mb-1">{rec.title}</h3>
-                        <p className="text-sm text-muted-foreground">{rec.description}</p>
-                      </div>
-                      <Button size="sm" variant="outline">
-                        <Zap className="w-4 h-4 mr-1" />
-                        Apply
-                      </Button>
-                    </div>
-                  </div>
-                ))}
-              </div>
-
-              <Button className="w-full mt-4" variant="outline">
-                <TrendingUp className="w-4 h-4 mr-2" />
-                View Detailed Analysis
+      {/* Header */}
+      <header className="bg-card border-b">
+        <div className="container mx-auto px-4 py-4">
+          <div className="flex justify-between items-center">
+            <div className="flex items-center gap-4">
+              <Button variant="ghost" size="sm" onClick={() => navigate('/')}>
+                <Home className="h-4 w-4 mr-2" />
+                Home
               </Button>
-            </Card>
-
-            {/* Recent Orders */}
-            <Card className="p-6 shadow-soft">
-              <div className="flex items-center justify-between mb-6">
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 bg-accent/10 rounded-full flex items-center justify-center">
-                    <ShoppingCart className="w-5 h-5 text-accent" />
-                  </div>
-                  <div>
-                    <h2 className="text-xl font-bold text-foreground">Recent Orders</h2>
-                    <p className="text-sm text-muted-foreground">Track your nutrition kits and purchases</p>
-                  </div>
-                </div>
-                <Button size="sm">
-                  <Plus className="w-4 h-4 mr-1" />
-                  New Order
-                </Button>
+              <div>
+                <h1 className="text-2xl font-bold">ArogyaMix Dashboard</h1>
+                <p className="text-muted-foreground">Welcome back, {user.email}</p>
               </div>
-
-              <div className="space-y-3">
-                {recentOrders.map((order, index) => (
-                  <div key={index} className="flex items-center justify-between p-3 border border-border rounded-lg">
-                    <div className="flex items-center gap-3">
-                      <div className="w-8 h-8 bg-primary/10 rounded-full flex items-center justify-center">
-                        <Apple className="w-4 h-4 text-primary" />
-                      </div>
-                      <div>
-                        <h4 className="font-medium text-foreground">{order.name}</h4>
-                        <p className="text-sm text-muted-foreground">{order.date}</p>
-                      </div>
-                    </div>
-                    <div className="text-right">
-                      <div className="font-semibold text-foreground">{order.amount}</div>
-                      <Badge 
-                        variant={order.status === 'delivered' ? 'secondary' : 'outline'}
-                        className="text-xs"
-                      >
-                        {order.status}
-                      </Badge>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </Card>
-          </div>
-
-          {/* Sidebar */}
-          <div className="space-y-6">
-            {/* Quick Actions */}
-            <Card className="p-6 shadow-soft">
-              <h3 className="font-bold text-foreground mb-4">Quick Actions</h3>
-              <div className="space-y-3">
-                <Button className="w-full justify-start" variant="outline">
-                  <Calendar className="w-4 h-4 mr-2" />
-                  Book Appointment
-                </Button>
-                <Button className="w-full justify-start" variant="outline">
-                  <ShoppingCart className="w-4 h-4 mr-2" />
-                  Order Nutrition Kit
-                </Button>
-                <Button className="w-full justify-start" variant="outline">
-                  <Activity className="w-4 h-4 mr-2" />
-                  Update Health Data
-                </Button>
-                <Button className="w-full justify-start" variant="outline">
-                  <Heart className="w-4 h-4 mr-2" />
-                  Wellness Classes
-                </Button>
-              </div>
-            </Card>
-
-            {/* Upcoming Appointments */}
-            <Card className="p-6 shadow-soft">
-              <h3 className="font-bold text-foreground mb-4">Upcoming Appointments</h3>
-              <div className="space-y-3">
-                {upcomingAppointments.map((apt, index) => (
-                  <div key={index} className="p-3 border border-border rounded-lg">
-                    <div className="flex items-center gap-2 mb-2">
-                      <Clock className="w-4 h-4 text-primary" />
-                      <span className="text-sm font-medium text-foreground">{apt.date}</span>
-                    </div>
-                    <h4 className="font-medium text-foreground text-sm">{apt.type}</h4>
-                    <p className="text-xs text-muted-foreground">{apt.doctor}</p>
-                    <Badge 
-                      variant={apt.status === 'confirmed' ? 'secondary' : 'outline'}
-                      className="text-xs mt-2"
-                    >
-                      {apt.status}
-                    </Badge>
-                  </div>
-                ))}
-              </div>
-              <Button size="sm" variant="outline" className="w-full mt-4">
-                View All Appointments
-              </Button>
-            </Card>
-
-            {/* Health Goal */}
-            <Card className="p-6 shadow-soft bg-gradient-hero text-primary-foreground">
-              <div className="flex items-center gap-3 mb-4">
-                <Target className="w-6 h-6" />
-                <h3 className="font-bold">This Month's Goal</h3>
-              </div>
-              <p className="text-sm mb-4 opacity-90">
-                Improve immunity score by 15% through nutrition optimization
-              </p>
-              <Progress value={65} className="h-2 mb-2" />
-              <p className="text-xs opacity-75">65% completed</p>
-            </Card>
+            </div>
+            <Button variant="outline" onClick={handleSignOut}>
+              <LogOut className="h-4 w-4 mr-2" />
+              Sign Out
+            </Button>
           </div>
         </div>
-      </div>
+      </header>
+
+      {/* Main Content */}
+      <main className="container mx-auto px-4 py-8">
+        <div className="max-w-6xl mx-auto">
+          <Tabs defaultValue="overview" className="space-y-6">
+            <TabsList className="grid w-full grid-cols-4">
+              <TabsTrigger value="overview">Overview</TabsTrigger>
+              <TabsTrigger value="appointments">Appointments</TabsTrigger>
+              <TabsTrigger value="store">Store</TabsTrigger>
+              <TabsTrigger value="profile">Profile</TabsTrigger>
+            </TabsList>
+
+            {/* Overview Tab */}
+            <TabsContent value="overview" className="space-y-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                <Card>
+                  <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                    <CardTitle className="text-sm font-medium">Health Score</CardTitle>
+                    <Heart className="h-4 w-4 text-muted-foreground" />
+                  </CardHeader>
+                  <CardContent>
+                    <div className="text-2xl font-bold text-primary">85%</div>
+                    <p className="text-xs text-muted-foreground">
+                      +5% from last month
+                    </p>
+                  </CardContent>
+                </Card>
+                
+                <Card>
+                  <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                    <CardTitle className="text-sm font-medium">Appointments</CardTitle>
+                    <Calendar className="h-4 w-4 text-muted-foreground" />
+                  </CardHeader>
+                  <CardContent>
+                    <div className="text-2xl font-bold">3</div>
+                    <p className="text-xs text-muted-foreground">
+                      This month
+                    </p>
+                  </CardContent>
+                </Card>
+
+                <Card>
+                  <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                    <CardTitle className="text-sm font-medium">Orders</CardTitle>
+                    <ShoppingCart className="h-4 w-4 text-muted-foreground" />
+                  </CardHeader>
+                  <CardContent>
+                    <div className="text-2xl font-bold">12</div>
+                    <p className="text-xs text-muted-foreground">
+                      From organic store
+                    </p>
+                  </CardContent>
+                </Card>
+
+                <Card>
+                  <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                    <CardTitle className="text-sm font-medium">Next Session</CardTitle>
+                    <Clock className="h-4 w-4 text-muted-foreground" />
+                  </CardHeader>
+                  <CardContent>
+                    <div className="text-2xl font-bold">2d</div>
+                    <p className="text-xs text-muted-foreground">
+                      Nutrition consultation
+                    </p>
+                  </CardContent>
+                </Card>
+              </div>
+
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <Card>
+                  <CardHeader>
+                    <CardTitle>Quick Actions</CardTitle>
+                    <CardDescription>
+                      Common tasks to manage your health journey
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent className="space-y-4">
+                    <Button className="w-full justify-start" onClick={() => navigate('/store')}>
+                      <ShoppingCart className="h-4 w-4 mr-2" />
+                      Visit Organic Store
+                    </Button>
+                    <Button variant="outline" className="w-full justify-start">
+                      <Calendar className="h-4 w-4 mr-2" />
+                      Schedule Consultation
+                    </Button>
+                    <Button variant="outline" className="w-full justify-start">
+                      <UserIcon className="h-4 w-4 mr-2" />
+                      Update Health Goals
+                    </Button>
+                  </CardContent>
+                </Card>
+
+                <Card>
+                  <CardHeader>
+                    <CardTitle>Health Tips</CardTitle>
+                    <CardDescription>
+                      Personalized recommendations for your wellness
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent className="space-y-4">
+                    <div className="p-4 bg-muted rounded-lg">
+                      <h4 className="font-semibold text-sm">Stay Hydrated</h4>
+                      <p className="text-sm text-muted-foreground mt-1">
+                        Aim for 8-10 glasses of water daily for optimal health.
+                      </p>
+                    </div>
+                    <div className="p-4 bg-muted rounded-lg">
+                      <h4 className="font-semibold text-sm">Organic Vegetables</h4>
+                      <p className="text-sm text-muted-foreground mt-1">
+                        Try our fresh spinach and kale for iron-rich nutrition.
+                      </p>
+                    </div>
+                  </CardContent>
+                </Card>
+              </div>
+            </TabsContent>
+
+            {/* Appointments Tab */}
+            <TabsContent value="appointments" className="space-y-6">
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <AppointmentBooking />
+                <div className="lg:col-span-1">
+                  <AppointmentsList />
+                </div>
+              </div>
+            </TabsContent>
+
+            {/* Store Tab */}
+            <TabsContent value="store" className="space-y-6">
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <ShoppingCart className="h-5 w-5" />
+                    ArogyaMix Organic Store
+                  </CardTitle>
+                  <CardDescription>
+                    Fresh, organic produce delivered to your doorstep
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <p className="text-muted-foreground">
+                    Our organic store connects you directly with local farmers, ensuring you get the freshest, 
+                    most nutritious produce while supporting sustainable agriculture.
+                  </p>
+                  
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div className="p-4 border rounded-lg text-center">
+                      <div className="text-2xl font-bold text-primary">500+</div>
+                      <div className="text-sm text-muted-foreground">Organic Products</div>
+                    </div>
+                    <div className="p-4 border rounded-lg text-center">
+                      <div className="text-2xl font-bold text-primary">50+</div>
+                      <div className="text-sm text-muted-foreground">Partner Farmers</div>
+                    </div>
+                    <div className="p-4 border rounded-lg text-center">
+                      <div className="text-2xl font-bold text-primary">24h</div>
+                      <div className="text-sm text-muted-foreground">Fresh Delivery</div>
+                    </div>
+                  </div>
+
+                  <div className="flex gap-4 pt-4">
+                    <Button onClick={() => navigate('/store')} className="flex-1">
+                      <ShoppingCart className="h-4 w-4 mr-2" />
+                      Shop Now
+                    </Button>
+                    <Button variant="outline" className="flex-1">
+                      View Order History
+                    </Button>
+                  </div>
+                </CardContent>
+              </Card>
+            </TabsContent>
+
+            {/* Profile Tab */}
+            <TabsContent value="profile" className="space-y-6">
+              <UserProfile />
+            </TabsContent>
+          </Tabs>
+        </div>
+      </main>
     </div>
   );
 };

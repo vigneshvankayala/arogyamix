@@ -7,6 +7,7 @@ import Index from "./pages/Index";
 import Dashboard from "./pages/Dashboard";
 import Store from "./pages/Store";
 import Appointments from "./pages/Appointments";
+import Auth from "./pages/Auth";
 import NotFound from "./pages/NotFound";
 import Navbar from "./components/Navbar";
 import PartnerOnboarding from "./components/PartnerOnboarding";
@@ -23,6 +24,7 @@ const App = () => (
         <Navbar />
         <Routes>
           <Route path="/" element={<Index />} />
+          <Route path="/auth" element={<Auth />} />
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/store" element={<Store />} />
           <Route path="/appointments" element={<Appointments />} />

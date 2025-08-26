@@ -34,6 +34,7 @@ const Hero = () => {
               variant="hero" 
               size="lg"
               className="text-lg px-8 py-6"
+              onClick={() => window.location.href = '/auth'}
             >
               Start Your Health Journey
             </Button>
@@ -41,6 +42,10 @@ const Hero = () => {
               variant="outline" 
               size="lg"
               className="text-lg px-8 py-6 bg-background/10 border-primary-foreground/30 text-primary-foreground hover:bg-primary-foreground hover:text-primary"
+              onClick={() => {
+                const featuresSection = document.getElementById('features');
+                featuresSection?.scrollIntoView({ behavior: 'smooth' });
+              }}
             >
               Learn More
             </Button>
