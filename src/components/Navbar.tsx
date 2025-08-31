@@ -49,12 +49,16 @@ const Navbar = () => {
 
           {/* Auth Buttons */}
           <div className="hidden md:flex items-center space-x-4">
-            <Button variant="outline" size="sm">
-              <User className="w-4 h-4 mr-2" />
-              Login
+            <Button variant="outline" size="sm" asChild>
+              <Link to="/auth">
+                <User className="w-4 h-4 mr-2" />
+                Login
+              </Link>
             </Button>
-            <Button variant="default" size="sm">
-              Sign Up
+            <Button variant="default" size="sm" asChild>
+              <Link to="/auth">
+                Sign Up
+              </Link>
             </Button>
           </div>
 
@@ -95,12 +99,16 @@ const Navbar = () => {
               })}
             </div>
             <div className="mt-4 pt-4 border-t border-border space-y-2">
-              <Button variant="outline" size="sm" className="w-full">
-                <User className="w-4 h-4 mr-2" />
-                Login
+              <Button variant="outline" size="sm" className="w-full" asChild>
+                <Link to="/auth" onClick={() => setIsMenuOpen(false)}>
+                  <User className="w-4 h-4 mr-2" />
+                  Login
+                </Link>
               </Button>
-              <Button variant="default" size="sm" className="w-full">
-                Sign Up
+              <Button variant="default" size="sm" className="w-full" asChild>
+                <Link to="/auth" onClick={() => setIsMenuOpen(false)}>
+                  Sign Up
+                </Link>
               </Button>
             </div>
           </div>
