@@ -1,4 +1,4 @@
-import familyImage from "@/assets/family-cooking.jpg";
+import familyImage from "@/assets/hero-fresh-produce.jpg";
 
 const About = () => {
   return (
@@ -44,7 +44,7 @@ const About = () => {
             <div className="relative overflow-hidden rounded-2xl shadow-glow">
               <img 
                 src={familyImage} 
-                alt="Family cooking together" 
+                alt="Fresh organic produce from local farmers" 
                 className="w-full h-auto object-cover"
               />
             </div>
