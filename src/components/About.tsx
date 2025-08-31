@@ -1,4 +1,4 @@
-import familyImage from "@/assets/farmers-field.jpg";
+import familyImage from "@/assets/hero-farming-field.jpg";
 
 const About = () => {
   return (
