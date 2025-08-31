@@ -1,4 +1,5 @@
 import { Search, Package, Truck, Heart } from "lucide-react";
+import familyHealthImage from "@/assets/family-health-analysis.jpg";
 
 const HowItWorks = () => {
   const steps = [
@@ -86,9 +87,19 @@ const HowItWorks = () => {
               {/* Visual */}
               <div className={`${index % 2 === 1 ? 'lg:col-start-1' : ''}`}>
                 <div className="bg-gradient-card p-12 rounded-2xl shadow-soft border flex flex-col items-center text-center">
-                  <div className="w-20 h-20 bg-primary/10 rounded-full flex items-center justify-center mb-6">
-                    <step.icon className="w-10 h-10 text-primary" />
-                  </div>
+                  {index === 0 ? (
+                    <div className="w-full max-w-sm mb-6">
+                      <img 
+                        src={familyHealthImage} 
+                        alt="Family health analysis with wellness charts and healthy lifestyle" 
+                        className="w-full h-auto rounded-lg shadow-soft"
+                      />
+                    </div>
+                  ) : (
+                    <div className="w-20 h-20 bg-primary/10 rounded-full flex items-center justify-center mb-6">
+                      <step.icon className="w-10 h-10 text-primary" />
+                    </div>
+                  )}
                   <div className="text-3xl font-bold text-primary mb-2">Step {step.step}</div>
                   <div className="text-foreground font-medium">{step.title}</div>
                 </div>
