@@ -78,6 +78,7 @@ export type Database = {
           status: string | null
           target_market: string | null
           updated_at: string
+          user_id: string
         }
         Insert: {
           additional_info?: string | null
@@ -97,6 +98,7 @@ export type Database = {
           status?: string | null
           target_market?: string | null
           updated_at?: string
+          user_id: string
         }
         Update: {
           additional_info?: string | null
@@ -116,6 +118,7 @@ export type Database = {
           status?: string | null
           target_market?: string | null
           updated_at?: string
+          user_id?: string
         }
         Relationships: []
       }

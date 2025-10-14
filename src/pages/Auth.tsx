@@ -22,7 +22,7 @@ const Auth = () => {
     // Set up auth state listener FIRST
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       (event, session) => {
-        console.log('Auth state changed:', event, session);
+        // Removed console.log for security - prevents token exposure in DevTools
         setSession(session);
         setUser(session?.user ?? null);
         
@@ -47,10 +47,70 @@ const Auth = () => {
 
   const handleSignUp = async (e: React.FormEvent) => {
     e.preventDefault();
+    
+    // Input validation
     if (!email || !password || !fullName) {
       toast({
         title: "Error",
         description: "Please fill in all fields",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    // Email validation
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email) || email.length > 255) {
+      toast({
+        title: "Invalid Email",
+        description: "Please enter a valid email address (max 255 characters)",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    // Password strength validation
+    if (password.length < 8 || password.length > 128) {
+      toast({
+        title: "Invalid Password",
+        description: "Password must be between 8 and 128 characters",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (!/[A-Z]/.test(password)) {
+      toast({
+        title: "Weak Password",
+        description: "Password must contain at least one uppercase letter",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (!/[a-z]/.test(password)) {
+      toast({
+        title: "Weak Password",
+        description: "Password must contain at least one lowercase letter",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (!/[0-9]/.test(password)) {
+      toast({
+        title: "Weak Password",
+        description: "Password must contain at least one number",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    // Full name validation
+    if (fullName.length < 2 || fullName.length > 100) {
+      toast({
+        title: "Invalid Name",
+        description: "Full name must be between 2 and 100 characters",
         variant: "destructive",
       });
       return;
@@ -105,10 +165,23 @@ const Auth = () => {
 
   const handleSignIn = async (e: React.FormEvent) => {
     e.preventDefault();
+    
+    // Input validation
     if (!email || !password) {
       toast({
         title: "Error",
         description: "Please enter both email and password",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    // Email format validation
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      toast({
+        title: "Invalid Email",
+        description: "Please enter a valid email address",
         variant: "destructive",
       });
       return;

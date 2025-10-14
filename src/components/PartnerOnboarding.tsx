@@ -53,7 +53,21 @@ const PartnerOnboarding = () => {
   const handleSubmit = async (data: PartnerFormData) => {
     setIsSubmitting(true);
     try {
+      // Check authentication
+      const { data: { user } } = await supabase.auth.getUser();
+      
+      if (!user) {
+        toast({
+          title: "Authentication Required",
+          description: "Please sign in to submit a partner application.",
+          variant: "destructive",
+        });
+        setIsSubmitting(false);
+        return;
+      }
+
       const { error } = await supabase.from("partners").insert({
+        user_id: user.id,
         email: data.email,
         full_name: data.fullName,
         phone: data.phone,
