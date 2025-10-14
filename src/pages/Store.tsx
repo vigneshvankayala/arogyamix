@@ -16,6 +16,12 @@ import {
   Truck,
   Shield
 } from "lucide-react";
+import foxtailMilletImg from "@/assets/product-foxtail-millet.jpg";
+import himalayanAlmondsImg from "@/assets/product-himalayan-almonds.jpg";
+import brownRiceImg from "@/assets/product-brown-rice.jpg";
+import datesImg from "@/assets/product-dates.jpg";
+import ragiImg from "@/assets/product-ragi.jpg";
+import mixedDryFruitsImg from "@/assets/product-mixed-dryfruits.jpg";
 
 const Store = () => {
   const [cartItems, setCartItems] = useState<Record<number, number>>({});
@@ -37,7 +43,7 @@ const Store = () => {
       originalPrice: 220,
       rating: 4.8,
       reviews: 124,
-      image: "/placeholder.svg",
+      image: foxtailMilletImg,
       description: "Premium quality foxtail millet, rich in protein and fiber",
       benefits: ["High Protein", "Gluten-Free", "Rich in Iron"],
       farmerName: "Ravi Kumar",
@@ -53,7 +59,7 @@ const Store = () => {
       originalPrice: 950,
       rating: 4.9,
       reviews: 89,
-      image: "/placeholder.svg",
+      image: himalayanAlmondsImg,
       description: "Premium Himalayan almonds, naturally sweet and nutritious",
       benefits: ["Vitamin E", "Healthy Fats", "Brain Health"],
       farmerName: "Suresh Patel",
@@ -69,7 +75,7 @@ const Store = () => {
       originalPrice: 140,
       rating: 4.7,
       reviews: 156,
-      image: "/placeholder.svg", 
+      image: brownRiceImg, 
       description: "Organically grown brown rice with complete nutrition",
       benefits: ["High Fiber", "Magnesium", "Complex Carbs"],
       farmerName: "Lakshmi Devi",
@@ -85,7 +91,7 @@ const Store = () => {
       originalPrice: 480,
       rating: 4.6,
       reviews: 92,
-      image: "/placeholder.svg",
+      image: datesImg,
       description: "Medjool dates - natural sweetener packed with nutrients",
       benefits: ["Natural Energy", "Potassium", "Antioxidants"],
       farmerName: "Ahmed Khan",
@@ -101,7 +107,7 @@ const Store = () => {
       originalPrice: 190,
       rating: 4.8,
       reviews: 203,
-      image: "/placeholder.svg",
+      image: ragiImg,
       description: "Calcium-rich finger millet for strong bones",
       benefits: ["High Calcium", "Gluten-Free", "Iron Rich"],
       farmerName: "Geetha Rao",
@@ -117,7 +123,7 @@ const Store = () => {
       originalPrice: 1400,
       rating: 4.9,
       reviews: 67,
-      image: "/placeholder.svg",
+      image: mixedDryFruitsImg,
       description: "Premium mix of almonds, cashews, walnuts, and raisins",
       benefits: ["Complete Nutrition", "Heart Health", "Brain Power"],
       farmerName: "Collective",
@@ -218,9 +224,11 @@ const Store = () => {
                   .map((product) => (
                     <Card key={product.id} className="overflow-hidden shadow-soft hover:shadow-glow transition-all duration-300 group">
                       <div className="relative">
-                        <div className="aspect-square bg-gradient-card flex items-center justify-center">
-                          <Package className="w-16 h-16 text-muted-foreground" />
-                        </div>
+                        <img 
+                          src={product.image} 
+                          alt={product.name}
+                          className="aspect-square w-full object-cover"
+                        />
                         
                         {product.discount > 0 && (
                           <Badge className="absolute top-2 left-2 bg-destructive text-destructive-foreground">
