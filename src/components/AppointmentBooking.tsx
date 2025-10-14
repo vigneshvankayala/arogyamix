@@ -7,6 +7,15 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { useToast } from "@/components/ui/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { Calendar, Clock, Video } from "lucide-react";
+import { z } from "zod";
+
+const appointmentSchema = z.object({
+  title: z.string().trim().min(1, "Title is required").max(200, "Title must be less than 200 characters"),
+  description: z.string().max(2000, "Description must be less than 2000 characters").optional(),
+  appointmentDate: z.string().min(1, "Date is required"),
+  appointmentTime: z.string().min(1, "Time is required"),
+  appointmentType: z.enum(['consultation', 'nutrition', 'fitness', 'follow-up', 'emergency']),
+});
 
 const AppointmentBooking = () => {
   const [title, setTitle] = useState("");
@@ -24,10 +33,21 @@ const AppointmentBooking = () => {
 
   const handleBookAppointment = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!title || !appointmentDate || !appointmentTime || !appointmentType) {
+    
+    // Validate input with zod schema
+    const validationResult = appointmentSchema.safeParse({
+      title: title.trim(),
+      description: description || undefined,
+      appointmentDate,
+      appointmentTime,
+      appointmentType,
+    });
+
+    if (!validationResult.success) {
+      const firstError = validationResult.error.errors[0];
       toast({
-        title: "Error",
-        description: "Please fill in all required fields",
+        title: "Validation Error",
+        description: firstError.message,
         variant: "destructive",
       });
       return;
@@ -46,6 +66,18 @@ const AppointmentBooking = () => {
       }
 
       const appointmentDateTime = new Date(`${appointmentDate}T${appointmentTime}`);
+      
+      // Validate appointment is not in the past
+      if (appointmentDateTime < new Date()) {
+        toast({
+          title: "Error",
+          description: "Cannot book appointments in the past",
+          variant: "destructive",
+        });
+        setLoading(false);
+        return;
+      }
+      
       const googleMeetLink = generateGoogleMeetLink();
 
       const { data, error } = await supabase
@@ -107,6 +139,7 @@ const AppointmentBooking = () => {
               placeholder="Appointment Title"
               value={title}
               onChange={(e) => setTitle(e.target.value)}
+              maxLength={200}
               required
             />
           </div>
@@ -151,6 +184,7 @@ const AppointmentBooking = () => {
               placeholder="Description (optional)"
               value={description}
               onChange={(e) => setDescription(e.target.value)}
+              maxLength={2000}
               rows={3}
             />
           </div>

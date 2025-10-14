@@ -7,6 +7,15 @@ import { supabase } from "@/integrations/supabase/client";
 import { Calendar, Clock, Video, ExternalLink } from "lucide-react";
 import { format } from "date-fns";
 
+const isValidMeetLink = (url: string): boolean => {
+  try {
+    const urlObj = new URL(url);
+    return urlObj.hostname === 'meet.google.com' && urlObj.protocol === 'https:';
+  } catch {
+    return false;
+  }
+};
+
 interface Appointment {
   id: string;
   title: string;
@@ -157,7 +166,17 @@ const AppointmentsList = () => {
                       variant="outline"
                       size="sm"
                       className="flex items-center gap-2"
-                      onClick={() => window.open(appointment.google_meet_link!, '_blank')}
+                      onClick={() => {
+                        if (appointment.google_meet_link && isValidMeetLink(appointment.google_meet_link)) {
+                          window.open(appointment.google_meet_link, '_blank', 'noopener,noreferrer');
+                        } else {
+                          toast({
+                            title: "Invalid Link",
+                            description: "The meeting link is not valid",
+                            variant: "destructive",
+                          });
+                        }
+                      }}
                     >
                       <Video className="h-4 w-4" />
                       Join Meeting
