@@ -7,6 +7,40 @@ import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/components/ui/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { User, Settings, Heart, Phone, Calendar } from "lucide-react";
+import { z } from "zod";
+
+const phoneRegex = /^[\d\s\-\+\(\)]+$/;
+
+const profileSchema = z.object({
+  full_name: z.string().trim().max(100, "Name must be less than 100 characters").optional(),
+  phone: z.string().trim().regex(phoneRegex, "Invalid phone number format").max(20, "Phone must be less than 20 characters").optional().or(z.literal("")),
+  date_of_birth: z.string().refine((date) => {
+    if (!date) return true;
+    const birthDate = new Date(date);
+    const minDate = new Date("1900-01-01");
+    const today = new Date();
+    return birthDate >= minDate && birthDate <= today;
+  }, "Date of birth must be between 1900 and today").optional().or(z.literal("")),
+  health_goals: z.string().max(500, "Health goals must be less than 500 characters").optional(),
+  dietary_preferences: z.string().max(500, "Dietary preferences must be less than 500 characters").optional(),
+  medical_conditions: z.string().max(500, "Medical conditions must be less than 500 characters").optional(),
+  emergency_contact_name: z.string().trim().max(100, "Emergency contact name must be less than 100 characters").optional(),
+  emergency_contact_phone: z.string().trim().regex(phoneRegex, "Invalid emergency phone format").max(20, "Emergency phone must be less than 20 characters").optional().or(z.literal("")),
+});
+
+const validateArrayItems = (input: string, maxItems: number, maxItemLength: number): string | null => {
+  if (!input.trim()) return null;
+  const items = input.split(',').map(s => s.trim()).filter(Boolean);
+  if (items.length > maxItems) {
+    return `Maximum ${maxItems} items allowed`;
+  }
+  for (const item of items) {
+    if (item.length > maxItemLength) {
+      return `Each item must be less than ${maxItemLength} characters`;
+    }
+  }
+  return null;
+};
 
 interface Profile {
   id: string;
@@ -88,19 +122,48 @@ const UserProfile = () => {
     setSaving(true);
     
     try {
+      // Validate with zod schema
+      const validationResult = profileSchema.safeParse(formData);
+      
+      if (!validationResult.success) {
+        const firstError = validationResult.error.errors[0];
+        toast({
+          title: "Validation Error",
+          description: firstError.message,
+          variant: "destructive",
+        });
+        setSaving(false);
+        return;
+      }
+
+      // Validate array field limits
+      const healthGoalsError = validateArrayItems(formData.health_goals, 10, 100);
+      const dietaryPrefError = validateArrayItems(formData.dietary_preferences, 10, 100);
+      const medicalCondError = validateArrayItems(formData.medical_conditions, 10, 100);
+
+      if (healthGoalsError || dietaryPrefError || medicalCondError) {
+        toast({
+          title: "Validation Error",
+          description: healthGoalsError || dietaryPrefError || medicalCondError || "",
+          variant: "destructive",
+        });
+        setSaving(false);
+        return;
+      }
+
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) return;
 
       const profileData = {
         user_id: user.id,
-        full_name: formData.full_name || null,
-        phone: formData.phone || null,
+        full_name: formData.full_name.trim() || null,
+        phone: formData.phone.trim() || null,
         date_of_birth: formData.date_of_birth || null,
         health_goals: formData.health_goals ? formData.health_goals.split(',').map(s => s.trim()).filter(Boolean) : null,
         dietary_preferences: formData.dietary_preferences ? formData.dietary_preferences.split(',').map(s => s.trim()).filter(Boolean) : null,
         medical_conditions: formData.medical_conditions ? formData.medical_conditions.split(',').map(s => s.trim()).filter(Boolean) : null,
-        emergency_contact_name: formData.emergency_contact_name || null,
-        emergency_contact_phone: formData.emergency_contact_phone || null,
+        emergency_contact_name: formData.emergency_contact_name.trim() || null,
+        emergency_contact_phone: formData.emergency_contact_phone.trim() || null,
       };
 
       const { data, error } = await supabase
@@ -180,6 +243,7 @@ const UserProfile = () => {
                   value={formData.full_name}
                   onChange={(e) => setFormData({ ...formData, full_name: e.target.value })}
                   placeholder="Enter your full name"
+                  maxLength={100}
                 />
               </div>
               <div>
@@ -189,6 +253,7 @@ const UserProfile = () => {
                   value={formData.phone}
                   onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
                   placeholder="Enter your phone number"
+                  maxLength={20}
                 />
               </div>
             </div>
@@ -207,8 +272,9 @@ const UserProfile = () => {
               <Textarea
                 value={formData.health_goals}
                 onChange={(e) => setFormData({ ...formData, health_goals: e.target.value })}
-                placeholder="Enter your health goals (comma-separated)"
+                placeholder="Enter your health goals (comma-separated, max 10 items)"
                 rows={2}
+                maxLength={500}
               />
             </div>
 
@@ -217,8 +283,9 @@ const UserProfile = () => {
               <Textarea
                 value={formData.dietary_preferences}
                 onChange={(e) => setFormData({ ...formData, dietary_preferences: e.target.value })}
-                placeholder="Enter your dietary preferences (comma-separated)"
+                placeholder="Enter your dietary preferences (comma-separated, max 10 items)"
                 rows={2}
+                maxLength={500}
               />
             </div>
 
@@ -227,8 +294,9 @@ const UserProfile = () => {
               <Textarea
                 value={formData.medical_conditions}
                 onChange={(e) => setFormData({ ...formData, medical_conditions: e.target.value })}
-                placeholder="Enter any medical conditions (comma-separated)"
+                placeholder="Enter any medical conditions (comma-separated, max 10 items)"
                 rows={2}
+                maxLength={500}
               />
             </div>
 
@@ -239,6 +307,7 @@ const UserProfile = () => {
                   value={formData.emergency_contact_name}
                   onChange={(e) => setFormData({ ...formData, emergency_contact_name: e.target.value })}
                   placeholder="Emergency contact name"
+                  maxLength={100}
                 />
               </div>
               <div>
@@ -248,6 +317,7 @@ const UserProfile = () => {
                   value={formData.emergency_contact_phone}
                   onChange={(e) => setFormData({ ...formData, emergency_contact_phone: e.target.value })}
                   placeholder="Emergency contact phone"
+                  maxLength={20}
                 />
               </div>
             </div>
