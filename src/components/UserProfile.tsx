@@ -55,12 +55,23 @@ interface Profile {
   emergency_contact_phone: string | null;
 }
 
-const UserProfile = () => {
+interface UserProfileProps {
+  editMode?: boolean;
+  onEditModeChange?: (editing: boolean) => void;
+}
+
+const UserProfile = ({ editMode = false, onEditModeChange }: UserProfileProps) => {
   const [profile, setProfile] = useState<Profile | null>(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
-  const [editing, setEditing] = useState(false);
+  const [editing, setEditing] = useState(editMode);
   const { toast } = useToast();
+
+  useEffect(() => {
+    if (editMode) {
+      setEditing(true);
+    }
+  }, [editMode]);
 
   const [formData, setFormData] = useState({
     full_name: "",
@@ -178,6 +189,9 @@ const UserProfile = () => {
 
       setProfile(data);
       setEditing(false);
+      if (onEditModeChange) {
+        onEditModeChange(false);
+      }
       toast({
         title: "Success!",
         description: "Your profile has been updated successfully.",
@@ -224,7 +238,12 @@ const UserProfile = () => {
             <Button 
               variant="outline" 
               size="sm"
-              onClick={() => setEditing(true)}
+              onClick={() => {
+                setEditing(true);
+                if (onEditModeChange) {
+                  onEditModeChange(true);
+                }
+              }}
               className="flex items-center gap-2"
             >
               <Settings className="h-4 w-4" />
@@ -331,6 +350,9 @@ const UserProfile = () => {
                 variant="outline" 
                 onClick={() => {
                   setEditing(false);
+                  if (onEditModeChange) {
+                    onEditModeChange(false);
+                  }
                   fetchProfile(); // Reset form data
                 }}
                 disabled={saving}

@@ -24,6 +24,8 @@ const Dashboard = () => {
   const [user, setUser] = useState<User | null>(null);
   const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(true);
+  const [activeTab, setActiveTab] = useState("overview");
+  const [editProfileMode, setEditProfileMode] = useState(false);
   const navigate = useNavigate();
   const { toast } = useToast();
 
@@ -114,7 +116,7 @@ const Dashboard = () => {
       {/* Main Content */}
       <main className="container mx-auto px-4 py-8">
         <div className="max-w-6xl mx-auto">
-          <Tabs defaultValue="overview" className="space-y-6">
+          <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
             <TabsList className="grid w-full grid-cols-4">
               <TabsTrigger value="overview">Overview</TabsTrigger>
               <TabsTrigger value="appointments">Appointments</TabsTrigger>
@@ -191,11 +193,22 @@ const Dashboard = () => {
                       <ShoppingCart className="h-4 w-4 mr-2" />
                       Visit Organic Store
                     </Button>
-                    <Button variant="outline" className="w-full justify-start">
+                    <Button 
+                      variant="outline" 
+                      className="w-full justify-start"
+                      onClick={() => setActiveTab('appointments')}
+                    >
                       <Calendar className="h-4 w-4 mr-2" />
                       Schedule Consultation
                     </Button>
-                    <Button variant="outline" className="w-full justify-start">
+                    <Button 
+                      variant="outline" 
+                      className="w-full justify-start"
+                      onClick={() => {
+                        setActiveTab('profile');
+                        setEditProfileMode(true);
+                      }}
+                    >
                       <UserIcon className="h-4 w-4 mr-2" />
                       Update Health Goals
                     </Button>
@@ -285,7 +298,10 @@ const Dashboard = () => {
 
             {/* Profile Tab */}
             <TabsContent value="profile" className="space-y-6">
-              <UserProfile />
+              <UserProfile 
+                editMode={editProfileMode}
+                onEditModeChange={setEditProfileMode}
+              />
             </TabsContent>
           </Tabs>
         </div>
