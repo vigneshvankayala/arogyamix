@@ -1,5 +1,8 @@
 import { Search, Package, Truck, Heart } from "lucide-react";
 import familyHealthImage from "@/assets/family-health-analysis.jpg";
+import customKitImage from "@/assets/custom-kit-creation.jpg";
+import carefulPrepImage from "@/assets/careful-preparation.jpg";
+import monthlyDeliveryImage from "@/assets/monthly-delivery.jpg";
 
 const HowItWorks = () => {
   const steps = [
@@ -87,19 +90,23 @@ const HowItWorks = () => {
               {/* Visual */}
               <div className={`${index % 2 === 1 ? 'lg:col-start-1' : ''}`}>
                 <div className="bg-gradient-card p-12 rounded-2xl shadow-soft border flex flex-col items-center text-center">
-                  {index === 0 ? (
-                    <div className="w-full max-w-sm mb-6">
-                      <img 
-                        src={familyHealthImage} 
-                        alt="Family health analysis with wellness charts and healthy lifestyle" 
-                        className="w-full h-auto rounded-lg shadow-soft"
-                      />
-                    </div>
-                  ) : (
-                    <div className="w-20 h-20 bg-primary/10 rounded-full flex items-center justify-center mb-6">
-                      <step.icon className="w-10 h-10 text-primary" />
-                    </div>
-                  )}
+                  <div className="w-full max-w-sm mb-6">
+                    <img 
+                      src={
+                        index === 0 ? familyHealthImage :
+                        index === 1 ? customKitImage :
+                        index === 2 ? carefulPrepImage :
+                        monthlyDeliveryImage
+                      } 
+                      alt={
+                        index === 0 ? "Family health analysis with wellness charts and healthy lifestyle" :
+                        index === 1 ? "Custom personalized health grocery kit with organized organic produce and nutritious ingredients" :
+                        index === 2 ? "Quality assurance and careful preparation of fresh organic produce in clean facility" :
+                        "Eco-friendly delivery of health grocery boxes to happy family at doorstep"
+                      }
+                      className="w-full h-auto rounded-lg shadow-soft"
+                    />
+                  </div>
                   <div className="text-3xl font-bold text-primary mb-2">Step {step.step}</div>
                   <div className="text-foreground font-medium">{step.title}</div>
                 </div>
